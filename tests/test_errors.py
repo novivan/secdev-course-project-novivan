@@ -23,7 +23,7 @@ def test_empty_features():
     assert len(body) == 0
 
 
-def test_adding_user():
+def test_adding_feature():
     r = client.post("/add_feature", params={"feature_title": "bbbb", "feature_description": "cccc"})
     assert r.status_code == 200
 
