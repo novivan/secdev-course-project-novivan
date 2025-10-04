@@ -4,6 +4,7 @@ from app.main import app
 
 client = TestClient(app)
 
+
 def test_empty_users():
     r = client.get("/list_users")
     assert r.status_code == 200
@@ -24,7 +25,9 @@ def test_empty_features():
 
 
 def test_adding_feature():
-    r = client.post("/add_feature", params={"feature_title": "bbbb", "feature_description": "cccc"})
+    r = client.post(
+        "/add_feature", params={"feature_title": "bbbb", "feature_description": "cccc"}
+    )
     assert r.status_code == 200
 
 
