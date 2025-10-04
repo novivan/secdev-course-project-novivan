@@ -1,6 +1,12 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from .model_dao_service import Model_dao_service
+
+# preparing for app start
+mds = Model_dao_service()
+
+# start of the app
 app = FastAPI(title="SecDev Course App", version="0.1.0")
 
 
@@ -34,24 +40,31 @@ def health():
     return {"status": "ok"}
 
 
-# Example minimal entity (for tests/demo)
-_DB = {"items": []}
+@app.post("/add_user")
+def add_user(user_name: str):
+    mds.add_user(user_name)  # type: ignore
 
 
-@app.post("/items")
-def create_item(name: str):
-    if not name or len(name) > 100:
-        raise ApiError(
-            code="validation_error", message="name must be 1..100 chars", status=422
-        )
-    item = {"id": len(_DB["items"]) + 1, "name": name}
-    _DB["items"].append(item)
-    return item
+@app.post("/add_feature")
+def add_feature(feature_title: str, feature_description: str):
+    mds.add_feature(feature_title, feature_description)
 
 
-@app.get("/items/{item_id}")
-def get_item(item_id: int):
-    for it in _DB["items"]:
-        if it["id"] == item_id:
-            return it
-    raise ApiError(code="not_found", message="item not found", status=404)
+@app.post("/add_vote")
+def add_vote(feature_id: int, user_id: int):
+    mds.add_vote(feature_id, user_id)
+
+
+@app.get("/list_users")
+def get_users():
+    return mds.get_all_users()  # type: ignore
+
+
+@app.get("/list_features")
+def get_features():
+    return mds.get_all_features()  # type: ignore
+
+
+@app.get("/list_votes")
+def get_votes():
+    return mds.get_all_votes()  # type: ignore
