@@ -37,9 +37,9 @@ class Model_dao_service:
 
     # TODO: проверить, что такие user_id и feature_id есть
     def add_vote(self, feature_id: int, user_id: int):
-        if user_id not in self._user_dao:
+        if user_id not in self._user_dao._objects:
             raise Exception("there's no user with such id")
-        if feature_id not in self._feature_dao:
+        if feature_id not in self._feature_dao._objects:
             raise Exception("there's no feature with such id")
         new_Vote = Vote(self._next_ids[self._VOTE_IDS_KEY], feature_id, user_id)
         self._vote_dao.put(new_Vote)
