@@ -39,5 +39,5 @@ def test_empty_votes():
 
 
 def test_adding_vote():
-    r = client.post("/add_feature", params={"feature_id": "1", "user_id": "1"})
+    r = client.post("/add_vote", params={"feature_id": "1", "user_id": "1"})
     assert r.status_code == 200
