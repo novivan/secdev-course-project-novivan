@@ -7,3 +7,4 @@
 | NFR-05 | AUTH-02: Настройка JWT-мидлвары         | High      | https://github.com/hse-secdev-2025-fall/course-project-novivan/issues/7 |
 | NFR-06 | INFRA-01: Настройка Dependabot          | Medium    | https://github.com/hse-secdev-2025-fall/course-project-novivan/issues/8 |
 | NFR-08 | INFRA-03: Настройка алертинга           | Medium    | https://github.com/hse-secdev-2025-fall/course-project-novivan/issues/8 |
+

@@ -9,3 +9,4 @@
 | NFR-07 | Логирование действий         | Логировать голосования с correlation_id   | 100% запросов к /vote         | Логи (ELK)                  | Logging      | Low       |
 | NFR-08 | Время восстановления         | MTTR при падении сервиса                  | ≤ 15 минут                    | Инцидент-менеджмент (PagerDuty) | Platform  | Medium    |
 | NFR-09 | Емкость БД                   | SQLite/Postgres handles 10K фич           | ≤ 1 sec на запрос при 10K фич | Нагрузочный тест            | DB           | Medium    |
+
