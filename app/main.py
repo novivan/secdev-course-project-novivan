@@ -1,5 +1,4 @@
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
 
 from . import auth
 from .error_handler import problem
