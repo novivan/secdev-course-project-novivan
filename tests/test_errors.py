@@ -41,3 +41,13 @@ def test_empty_votes():
 def test_adding_vote():
     r = client.post("/add_vote", params={"feature_id": "1", "user_id": "1"})
     assert r.status_code == 200
+
+
+def test_rfc7807_format(client):
+    response = client.get("/list_users")  # без авторизации
+    assert response.status_code == 401
+    data = response.json()
+    assert "correlation_id" in data
+    assert data["type"] == "about:blank"
+    assert data["status"] == 401
+    assert data["title"] == "http_error"

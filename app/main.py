@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from . import auth
 from .model_dao_service import Model_dao_service, mds
 from .model import User
+from .error_handler import problem
 
 # start of the app
 app = FastAPI(title="SecDev Course App", version="0.1.0")
@@ -19,9 +20,10 @@ class ApiError(Exception):
 
 @app.exception_handler(ApiError)
 async def api_error_handler(request: Request, exc: ApiError):
-    return JSONResponse(
-        status_code=exc.status,
-        content={"error": {"code": exc.code, "message": exc.message}},
+    return problem(
+        status=exc.status,
+        title=exc.code,
+        detail=exc.message
     )
 
 
