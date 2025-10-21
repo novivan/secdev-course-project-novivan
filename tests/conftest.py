@@ -14,6 +14,7 @@ try:
 except ImportError as e:
     raise ImportError(f"Не удалось импортировать app.main. sys.path: {sys.path}") from e
 
+
 @pytest.fixture
 def client():
     return TestClient(app)
