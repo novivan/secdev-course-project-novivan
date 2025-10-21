@@ -56,12 +56,16 @@ def add_feature(
 
 
 @app.post("/add_vote")
-def add_vote(feature_id: int, user_id: int, current_user: User = Depends(auth.get_current_user)):
+def add_vote(
+    feature_id: int, user_id: int, current_user: User = Depends(auth.get_current_user)
+):
     mds.add_vote(feature_id, user_id)
 
 
 @app.post("/features/{feature_id}/vote")
-def vote_for_feature(feature_id: int, current_user: User = Depends(auth.get_current_user)):
+def vote_for_feature(
+    feature_id: int, current_user: User = Depends(auth.get_current_user)
+):
     features = mds.get_all_features()
     if feature_id not in features:
         raise HTTPException(status_code=404, detail="Feature not found")

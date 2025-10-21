@@ -67,7 +67,9 @@ def get_register_page():
 @router.post("/register")
 def register(username: str = Form(...), password: str = Form(...)):
     if len(password) > 72:
-        raise HTTPException(status_code=400, detail="Password too long (max 72 characters)")
+        raise HTTPException(
+            status_code=400, detail="Password too long (max 72 characters)"
+        )
     if len(password) < 4:
         raise HTTPException(status_code=400, detail="Password is too short")
 
