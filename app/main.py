@@ -95,6 +95,7 @@ def list_features(current_user: User = Depends(auth.get_current_user)):
     return mds.get_all_features()  # type: ignore
 
 
+#комментарий для запуска CI
 @app.get("/list_votes")
 def get_votes(current_user: User = Depends(auth.get_current_user)):
     return mds.get_all_votes()  # type: ignore
