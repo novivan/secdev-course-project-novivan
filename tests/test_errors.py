@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
@@ -31,13 +32,17 @@ def test_protected_routes_require_auth():
             response = client.get(url)
         elif method == "POST":
             response = client.post(url)
-        assert response.status_code == 401, f"{method} {url} должен требовать авторизацию"
+        assert (
+            response.status_code == 401
+        ), f"{method} {url} должен требовать авторизацию"
 
 
 def test_authenticated_requests_work():
     """Регистрация → логин → вызов защищённых роутов"""
     # 1. Регистрация
-    r = client.post("/auth/register", data={"username": "testuser", "password": "123456"})
+    r = client.post(
+        "/auth/register", data={"username": "testuser", "password": "123456"}
+    )
     assert r.status_code in [200, 201], f"Регистрация не удалась: {r.text}"
 
     # 2. Логин
@@ -63,7 +68,10 @@ def test_authenticated_requests_work():
     assert len(r.json()) == 0
 
     # 5. Добавляем фичу
-    r = client.post("/add_feature", params={"feature_title": "Dark Mode", "feature_description": "Add dark theme"})
+    r = client.post(
+        "/add_feature",
+        params={"feature_title": "Dark Mode", "feature_description": "Add dark theme"},
+    )
     assert r.status_code == 200
 
     # 6. Добавляем пользователя (админская ручка)
@@ -82,7 +90,9 @@ def test_authenticated_requests_work():
 def test_user_cannot_register_with_existing_name():
     """Проверяем, что нельзя зарегистрироваться с существующим именем"""
     client.post("/auth/register", data={"username": "uniqueuser", "password": "123456"})
-    r = client.post("/auth/register", data={"username": "uniqueuser", "password": "123456"})
+    r = client.post(
+        "/auth/register", data={"username": "uniqueuser", "password": "123456"}
+    )
     assert r.status_code == 400
 
 
