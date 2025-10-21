@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class Model_entity:
     _id: int
 
@@ -20,7 +21,7 @@ class User(Model_entity):
 
     def get_name(self):
         return self._name
-    
+
     def verify_password(self, plain_password: str) -> bool:
         if not self._hashed_password:
             return False

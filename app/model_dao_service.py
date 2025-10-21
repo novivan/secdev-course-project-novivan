@@ -29,13 +29,13 @@ class Model_dao_service:
         users = self.get_all_users()
         if any(u.get_name() == user_name for u in users.values()):
             raise Exception(f"User with name '{user_name}' already exists")
-        new_id = max((u.get_id() for u in users.values()), default = 0) + 1
+        new_id = max((u.get_id() for u in users.values()), default=0) + 1
         new_user = User(new_id, user_name)
         self._user_dao.put(new_user)
 
-        #new_User = User(self._next_ids[self._USER_IDS_KEY], user_name)
-        #self._user_dao.put(new_User)
-        #self._next_ids[self._USER_IDS_KEY] += 1
+        # new_User = User(self._next_ids[self._USER_IDS_KEY], user_name)
+        # self._user_dao.put(new_User)
+        # self._next_ids[self._USER_IDS_KEY] += 1
 
     def add_feature(self, title: str, desc: str):
         new_Feature = Feature(self._next_ids[self._FEATURE_IDS_KEY], title, desc)
@@ -60,5 +60,6 @@ class Model_dao_service:
 
     def get_all_votes(self):
         return self._vote_dao.get_objects()
+
 
 mds = Model_dao_service()
