@@ -39,25 +39,21 @@ def test_protected_routes_require_auth():
 
 def test_authenticated_requests_work():
     """Регистрация → логин → вызов защищённых роутов"""
-    # 1. Регистрация
     r = client.post(
         "/auth/register", data={"username": "testuser", "password": "123456"}
     )
     assert r.status_code in [200, 201], f"Регистрация не удалась: {r.text}"
 
-    # 2. Логин
     r = client.post("/auth/login", data={"username": "testuser", "password": "123456"})
     assert r.status_code == 200
     token = r.json().get("access_token")
     assert token is not None
 
-    # 3. Устанавливаем заголовок авторизации
     client.headers["Authorization"] = f"Bearer {token}"
 
-    # 4. Проверяем пустые списки
     r = client.get("/list_users")
     assert r.status_code == 200
-    assert len(r.json()) > 0  # должен быть хотя бы testuser
+    assert len(r.json()) > 0
 
     r = client.get("/list_features")
     assert r.status_code == 200
@@ -67,22 +63,18 @@ def test_authenticated_requests_work():
     assert r.status_code == 200
     assert len(r.json()) == 0
 
-    # 5. Добавляем фичу
     r = client.post(
         "/add_feature",
         params={"feature_title": "Dark Mode", "feature_description": "Add dark theme"},
     )
     assert r.status_code == 200
 
-    # 6. Добавляем пользователя (админская ручка)
     r = client.post("/add_user", params={"user_name": "testuser2"})
     assert r.status_code == 200
 
-    # 7. Голосуем
     r = client.post("/add_vote", params={"feature_id": 1, "user_id": 1})
     assert r.status_code == 200
 
-    # 8. Проверяем, что фича появилась
     r = client.get("/list_features")
     assert len(r.json()) == 1
 
