@@ -24,7 +24,7 @@ async def api_error_handler(request: Request, exc: ApiError):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return problem(status=exc.status, title=exc.code, detail=exc.message)
+    return problem(status=exc.status_code, title="http_error", detail=exc.detail)
 
 
 @app.get("/health")
