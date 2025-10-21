@@ -1,3 +1,7 @@
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 class Model_entity:
     _id: int
 
@@ -7,13 +11,20 @@ class Model_entity:
 
 class User(Model_entity):
     _name: str
+    _hashed_password: str
 
     def __init__(self, identificator: int, name: str):
         self._id = identificator
         self._name = name
+        self._hashed_password = ""
 
     def get_name(self):
         return self._name
+    
+    def verify_password(self, plain_password: str) -> bool:
+        if not self._hashed_password:
+            return False
+        return pwd_context.verify(plain_password, self._hashed_password)
 
 
 class Feature(Model_entity):

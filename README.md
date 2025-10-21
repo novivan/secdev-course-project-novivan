@@ -51,3 +51,14 @@ docker compose up --build
 ```
 
 См. также: `SECURITY.md`, `.pre-commit-config.yaml`, `.github/workflows/ci.yml`.
+
+## Плюс один (пока что рабочий) способ запускать приложение
+Находимся в корневой папке проекта. Пишем в терминале:
+```
+python3 -m uvicorn app.main:app --reload
+```
+открываем по ссылке из консоли
+выглядит она примерно так:
+```
+http://127.0.0.1:8000/docs
+```
