@@ -4,11 +4,11 @@
 
 ## Быстрый старт
 ```bash
-python -m venv .venv
+python3.13 -m venv .venv #версия такая для нормальной работы sqlalchemy
 source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt -r requirements-dev.txt
 pre-commit install
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
 ## Ритуал перед PR
@@ -52,13 +52,5 @@ docker compose up --build
 
 См. также: `SECURITY.md`, `.pre-commit-config.yaml`, `.github/workflows/ci.yml`.
 
-## Плюс один (пока что рабочий) способ запускать приложение
-Находимся в корневой папке проекта. Пишем в терминале:
-```
-python3 -m uvicorn app.main:app --reload
-```
-открываем по ссылке из консоли
-выглядит она примерно так:
-```
-http://127.0.0.1:8000/docs
-```
+# Для регистрации/авторизации (в рантайме)
+перейдите на /auth/register и /auth/login соответственно(добавить в конце url вместо /docs)

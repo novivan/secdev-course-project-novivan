@@ -1,9 +1,11 @@
 from fastapi import Depends, FastAPI, HTTPException, Request
 
-from . import auth
+from . import auth, init_db
 from .error_handler import problem
 from .model import User
 from .model_dao_service import mds
+
+init_db()
 
 # start of the app
 app = FastAPI(title="SecDev Course App", version="0.1.0")
