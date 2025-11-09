@@ -4,9 +4,12 @@ from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 
-from .model import User, pwd_context
+from .model import User
 from .model_dao_service import mds
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -66,6 +69,9 @@ def get_register_page():
 
 @router.post("/register")
 def register(username: str = Form(...), password: str = Form(...)):
+    print(
+        f"Registering user: {username}, password length: {len(password)}"
+    )  # Debug output
     if len(password) > 72:
         raise HTTPException(
             status_code=400, detail="Password too long (max 72 characters)"
@@ -74,16 +80,20 @@ def register(username: str = Form(...), password: str = Form(...)):
         raise HTTPException(status_code=400, detail="Password is too short")
 
     try:
-        mds.add_user(username)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    users = mds.get_all_users()
-    user = next((u for u in users.values() if u.get_name() == username), None)
-    if user is None:
-        raise HTTPException(status_code=500, detail="User created but not found")
+        print(f"Registering user: {username}, password length: {len(password)}")
 
-    user._hashed_password = pwd_context.hash(password)
-    return {"msg": "User created. Now you can <a href='/auth/login'>log in</a>."}
+        if mds.get_user_by_username(username):
+            raise HTTPException(status_code=400, detail="Username already registered")
+
+        hashed_password = pwd_context.hash(password)
+
+        # Use instance method
+        mds.add_user(username=username, user_hashsed_password=hashed_password)
+
+        return {"msg": "User created successfully"}
+    except Exception as e:
+        print(f"Registration error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # HTML-формы

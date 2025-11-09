@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="11" time="3.491" timestamp="2025-11-09T22:35:31.949640" hostname="Ivans-MacBook-Pro.local"><testcase classname="tests.test_auth" name="test_login_success" time="0.523" /><testcase classname="tests.test_errors" name="test_rfc7807_format_for_unauthorized" time="0.001" /><testcase classname="tests.test_errors" name="test_protected_routes_require_auth" time="0.004" /><testcase classname="tests.test_errors" name="test_authenticated_requests_work" time="0.500"><failure message="TypeError: Model_dao_service.add_user() missing 1 required positional argument: 'user_hashsed_password'">def test_authenticated_requests_work():
+        """Регистрация → логин → вызов защищённых роутов"""
+        r = client.post(
+            "/auth/register", data={"username": "testuser", "password": "123456"}
+        )
+        assert r.status_code in [200, 201], f"Регистрация не удалась: {r.text}"
+
+        r = client.post("/auth/login", data={"username": "testuser", "password": "123456"})
+        assert r.status_code == 200
+        token = r.json().get("access_token")
+        assert token is not None
+
+        client.headers["Authorization"] = f"Bearer {token}"
+
+        r = client.get("/list_users")
+        assert r.status_code == 200
+        assert len(r.json()) &gt; 0
+
+        r = client.get("/list_features")
+        assert r.status_code == 200
+        assert len(r.json()) == 0
+
+        r = client.get("/list_votes")
+        assert r.status_code == 200
+        assert len(r.json()) == 0
+
+        r = client.post(
+            "/add_feature",
+            params={"feature_title": "Dark Mode", "feature_description": "Add dark theme"},
+        )
+        assert r.status_code == 200
+
+&gt;       r = client.post("/add_user", params={"user_name": "testuser2"})
+
+tests/test_errors.py:72:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv/lib/python3.13/site-packages/starlette/testclient.py:597: in post
+    return super().post(
+.venv/lib/python3.13/site-packages/httpx/_client.py:1157: in post
+    return self.request(
+.venv/lib/python3.13/site-packages/starlette/testclient.py:488: in request
+    return super().request(
+.venv/lib/python3.13/site-packages/httpx/_client.py:837: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.13/site-packages/httpx/_client.py:926: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.13/site-packages/httpx/_client.py:954: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.13/site-packages/httpx/_client.py:991: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.13/site-packages/httpx/_client.py:1027: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.13/site-packages/starlette/testclient.py:381: in handle_request
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/testclient.py:378: in handle_request
+    portal.call(self.app, scope, receive, send)
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:321: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/opt/homebrew/Cellar/python@3.13/3.13.9_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/opt/homebrew/Cellar/python@3.13/3.13.9_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:252: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.13/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:62: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:51: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:62: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:51: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+.venv/lib/python3.13/site-packages/fastapi/routing.py:297: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.13/site-packages/fastapi/routing.py:212: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.13/site-packages/starlette/concurrency.py:39: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+.venv/lib/python3.13/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2485: in run_sync_in_worker_thread
+    return await future
+.venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:976: in run
+    result = context.run(func, *args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user_name = 'testuser2', current_user = &lt;app.model.User object at 0x108300f30&gt;
+
+    @app.post("/add_user")
+    def add_user(user_name: str, current_user: User = Depends(auth.get_current_user)):
+&gt;       mds.add_user(user_name)  # type: ignore
+E       TypeError: Model_dao_service.add_user() missing 1 required positional argument: 'user_hashsed_password'
+
+app/main.py:42: TypeError</failure></testcase><testcase classname="tests.test_errors" name="test_user_cannot_register_with_existing_name" time="0.247"><failure message="assert 500 == 400&#10; +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code">def test_user_cannot_register_with_existing_name():
+        """Проверяем, что нельзя зарегистрироваться с существующим именем"""
+        client.post("/auth/register", data={"username": "uniqueuser", "password": "123456"})
+        r = client.post(
+            "/auth/register", data={"username": "uniqueuser", "password": "123456"}
+        )
+&gt;       assert r.status_code == 400
+E       assert 500 == 400
+E        +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code
+
+tests/test_errors.py:88: AssertionError</failure></testcase><testcase classname="tests.test_errors" name="test_login_with_wrong_password" time="0.489" /><testcase classname="tests.test_health" name="test_health_ok" time="0.001" /><testcase classname="tests.test_s06_validation" name="test_register_reject_short_username" time="0.244"><failure message="assert 500 == 400&#10; +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code">def test_register_reject_short_username():
+        r = client.post("/auth/register", data={"username": "ab", "password": "12345"})
+&gt;       assert r.status_code == 400
+E       assert 500 == 400
+E        +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code
+
+tests/test_s06_validation.py:10: AssertionError</failure></testcase><testcase classname="tests.test_s06_validation" name="test_register_reject_long_username" time="0.244"><failure message="assert 500 == 400&#10; +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code">def test_register_reject_long_username():
+        long_name = "a" * 60
+        r = client.post("/auth/register", data={"username": long_name, "password": "12345"})
+&gt;       assert r.status_code == 400
+E       assert 500 == 400
+E        +  where 500 = &lt;Response [500 Internal Server Error]&gt;.status_code
+
+tests/test_s06_validation.py:16: AssertionError</failure></testcase><testcase classname="tests.test_s06_validation" name="test_repeat_vote_does_not_duplicate" time="0.504" /><testcase classname="tests.test_vote" name="test_user_cannot_vote_twice" time="0.500" /></testsuite></testsuites>

@@ -1,56 +1,94 @@
-from .model import Feature, Model_entity, User, Vote
+from sqlalchemy.orm import Session
+
+from . import SessionLocal
+from .model import Feature, User, Vote
 
 
-def singleton(cls):
-    instances = {}
-
-    def get_instance():
-        if cls not in instances:
-            instances[cls] = cls()
-        return instances[cls]
-
-    return get_instance
-
-
-#   TODO: connect dao to real database
 class Dao:
-    _objects: dict[int, Model_entity]
-
     def __init__(self):
-        self._objects = {}
+        self.db: Session = SessionLocal()
 
-    def put(self, object: Model_entity):
-        self._objects[object.get_id()] = object
+    def __del__(self):
+        self.db.close()
+
+
+class User_dao(Dao):
+    instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = cls()
+        return cls.instance
+
+    def put(self, object: User):
+        if not getattr(object, "name", None):
+            raise ValueError("Username cannot be None")
+        try:
+            self.db.add(object)
+            self.db.commit()
+            self.db.refresh(object)
+        except Exception:
+            self.db.rollback()
+            raise
 
     def get_objects(self):
-        return self._objects
+        users = self.db.query(User).all()
+        return {user.id: user for user in users}
+
+    def get_by_username(self, username: str) -> User | None:
+        return self.db.query(User).filter(User.name == username).first()
 
 
-@singleton
-class User_dao(Dao):
-    def put(self, object: User):  # type: ignore
-        self._objects[object.get_id()] = object
-
-
-@singleton
 class Feature_dao(Dao):
-    def put(self, object: Feature):  # type: ignore
-        self._objects[object.get_id()] = object
+    instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = cls()
+        return cls.instance
+
+    def put(self, object: Feature):
+        self.db.add(object)
+        self.db.commit()
+        self.db.refresh(object)
+
+    def get_objects(self):
+        features = self.db.query(Feature).all()
+        return {feature.id: feature for feature in features}
 
 
-@singleton
 class Vote_dao(Dao):
-    _votes_by_user_id: dict[int, Model_entity]
+    instance = None
 
-    def __init__(self):
-        self._objects = {}
-        self._votes_by_user_id = {}
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = cls()
+        return cls.instance
 
-    # тут put другой, потому что мы считаем что люди голосуют только за одну фичу
-    def put(self, object: Vote):  # type: ignore
-        if object.get_user_id() in self._votes_by_user_id:
-            object._id = self._votes_by_user_id[object.get_user_id()].get_id()
-            self._objects[object.get_id()] = object
-        else:
-            self._objects[object.get_id()] = object
-        self._votes_by_user_id[object.get_user_id()] = object
+    def put(self, object: Vote):
+        try:
+            existing_vote = (
+                self.db.query(Vote).filter(Vote.user_id == object.user_id).first()
+            )
+            if existing_vote:
+                # only update feature_id for existing user's vote — do NOT touch id
+                existing_vote.feature_id = object.feature_id
+                self.db.commit()
+                self.db.refresh(existing_vote)
+                return existing_vote
+            else:
+                self.db.add(object)
+                self.db.commit()
+                self.db.refresh(object)
+                return object
+        except Exception:
+            # ensure session usable after errors
+            self.db.rollback()
+            raise
+
+    def get_objects(self):
+        votes = self.db.query(Vote).all()
+        return {vote.id: vote for vote in votes}
