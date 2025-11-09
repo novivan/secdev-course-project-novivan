@@ -25,8 +25,6 @@ def get_db():
 def init_db():
     os.makedirs("data", exist_ok=True)
 
-    from .model import Feature, User, Vote
-
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 

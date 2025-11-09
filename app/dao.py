@@ -22,11 +22,15 @@ class User_dao(Dao):
         return cls.instance
 
     def put(self, object: User):
-        if not object.name:
+        if not getattr(object, "name", None):
             raise ValueError("Username cannot be None")
-        self.db.add(object)
-        self.db.commit()
-        self.db.refresh(object)
+        try:
+            self.db.add(object)
+            self.db.commit()
+            self.db.refresh(object)
+        except Exception:
+            self.db.rollback()
+            raise
 
     def get_objects(self):
         users = self.db.query(User).all()
