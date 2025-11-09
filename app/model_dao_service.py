@@ -1,3 +1,5 @@
+import re
+
 from .dao import Feature_dao, User_dao, Vote_dao
 from .model import Feature, User, Vote
 
@@ -33,7 +35,17 @@ class Model_dao_service:
         self.next_ids[self.VOTE_IDS_KEY] = 1
 
     def add_user(self, username: str, user_hashsed_password: str):
-        user = User(username, user_hashsed_password)
+        if username is None:
+            raise ValueError("username is required")
+        uname = username.strip()
+        if not re.fullmatch(r"[A-Za-z0-9_]{3,50}", uname):
+            raise ValueError(
+                "username must be 3-50 chars: letters, digits or underscore"
+            )
+        if not user_hashsed_password:
+            raise ValueError("hashed password is required")
+
+        user = User(username=uname, hashed_password=user_hashsed_password)
         self.user_dao.put(user)
 
     def add_feature(self, title: str, desc: str):
