@@ -5,6 +5,14 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from app import init_db
+
+
+@pytest.fixture(autouse=True)
+def setup_database():
+    init_db()
+
+
 ROOT = Path(__file__).resolve().parents[1]  # поднимаемся на уровень выше tests/
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))

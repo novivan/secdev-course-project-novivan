@@ -38,8 +38,10 @@ def health():
 
 
 @app.post("/add_user")
-def add_user(user_name: str, current_user: User = Depends(auth.get_current_user)):
-    mds.add_user(user_name)  # type: ignore
+def add_user(
+    user_name: str, password: str, current_user: User = Depends(auth.get_current_user)
+):
+    mds.add_user(user_name, password)  # type: ignore
 
 
 @app.post("/add_feature")

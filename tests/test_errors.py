@@ -69,7 +69,9 @@ def test_authenticated_requests_work():
     )
     assert r.status_code == 200
 
-    r = client.post("/add_user", params={"user_name": "testuser2"})
+    r = client.post(
+        "/add_user", params={"user_name": "testuser2", "password": "xxwwee"}
+    )
     assert r.status_code == 200
 
     r = client.post("/add_vote", params={"feature_id": 1, "user_id": 1})
