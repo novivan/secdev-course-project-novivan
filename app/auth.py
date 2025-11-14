@@ -72,6 +72,14 @@ def register(username: str = Form(...), password: str = Form(...)):
     print(
         f"Registering user: {username}, password length: {len(password)}"
     )  # Debug output
+    if len(username) < 4:
+        raise HTTPException(
+            status_code=400, detail="Username is too short (minimum 4 characters)"
+        )
+    if len(username) > 20:
+        raise HTTPException(
+            status_code=400, detail="Username is too long (maximum 20 characters)"
+        )
     if len(password) > 72:
         raise HTTPException(
             status_code=400, detail="Password too long (max 72 characters)"
@@ -91,6 +99,8 @@ def register(username: str = Form(...), password: str = Form(...)):
         mds.add_user(username=username, user_hashsed_password=hashed_password)
 
         return {"msg": "User created successfully"}
+    except HTTPException as e:
+        raise e
     except Exception as e:
         print(f"Registration error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

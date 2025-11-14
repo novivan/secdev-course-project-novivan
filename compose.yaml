@@ -4,5 +4,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-    profiles: ["dev"]
+      PYTHONUNBUFFERED: "1"
+      DATABASE_URL: sqlite:///./data/app.db
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s

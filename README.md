@@ -13,7 +13,7 @@ python -m uvicorn app.main:app --reload
 
 ## Ритуал перед PR
 ```bash
-ruff --fix .
+ruff check --output-format=github . --fix
 black .
 isort .
 pytest -q
