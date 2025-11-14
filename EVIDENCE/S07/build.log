@@ -1,0 +1,46 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 822B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.11-slim
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 191B done
+#3 DONE 0.0s
+
+#4 [build 1/6] FROM docker.io/library/python:3.11-slim@sha256:e4676722fba839e2e5cdb844a52262b43e90e56dbd55b7ad953ee3615ad7534f
+#4 resolve docker.io/library/python:3.11-slim@sha256:e4676722fba839e2e5cdb844a52262b43e90e56dbd55b7ad953ee3615ad7534f 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 139.06kB 0.1s done
+#5 DONE 0.1s
+
+#6 [build 2/6] WORKDIR /.
+#6 CACHED
+
+#7 [build 3/6] COPY requirements.txt requirements-dev.txt ./
+#7 CACHED
+
+#8 [build 4/6] RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
+#8 CACHED
+
+#9 [build 5/6] COPY . /
+#9 ERROR: cannot copy to non-directory: /var/lib/docker/buildkit/containerd-overlayfs/cachemounts/buildkit532710377/bin
+------
+ > [build 5/6] COPY . /:
+------
+Dockerfile:6
+--------------------
+   4 |     COPY requirements.txt requirements-dev.txt ./
+   5 |     RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
+   6 | >>> COPY . /
+   7 |     RUN pytest -q
+   8 |
+--------------------
+ERROR: failed to solve: cannot copy to non-directory: /var/lib/docker/buildkit/containerd-overlayfs/cachemounts/buildkit532710377/bin
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/qccrtqoasrcdy6xwe7nf9jzwg
