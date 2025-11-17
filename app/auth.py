@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from os import getenv
 
 from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.responses import HTMLResponse
@@ -13,7 +14,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-SECRET_KEY = "your-super-secret-key-change-in-production"
+SECRET_KEY = getenv("JWT_SECRET", "fallback_dev_key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
