@@ -6,3 +6,5 @@ python-multipart
 httpx
 sqlalchemy>=2.0.27
 bcrypt==4.0.1
+pytest-cov>=4.1.0
+coverage>=7.0.0
