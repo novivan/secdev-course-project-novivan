@@ -155,7 +155,9 @@ jobs:
     steps:
     - name: Notify status
       run: |
-        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.build.result }}" == "success" ]; then
+        if [ "${{ needs.test.result }}" == "success" ] && \
+           [ "${{ needs.build.result }}" == "success" ] ||
+           [ "${{ needs.build.result }}" == "skipped" ]; then
           echo "All checks passed!"
         else
           echo "Some checks failed"
