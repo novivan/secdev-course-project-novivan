@@ -1,9 +1,9 @@
 # Build stage
 FROM python:3.11-slim AS build
-WORKDIR /.
+WORKDIR /build
 COPY requirements.txt requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
-COPY . /
+COPY . .
 RUN pytest -q
 
 # Runtime stage
@@ -12,7 +12,7 @@ WORKDIR /app
 RUN useradd -m appuser
 COPY --from=build /usr/local/lib/python3.11 /usr/local/lib/python3.11
 COPY --from=build /usr/local/bin /usr/local/bin
-COPY . /
+COPY --from=build /build /app
 RUN mkdir -p /app/data \
     && chown -R appuser:appuser /app \
     && chmod -R 755 /app

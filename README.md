@@ -36,6 +36,10 @@ docker run --rm -p 8000:8000 secdev-app
 # или
 docker compose up --build
 ```
+Зайти из браузера при запущенном контейнере можно по адресу:
+```
+http://127.0.0.1:8000/docs
+```
 
 ## Эндпойнты
 - `GET /health` → `{"status": "ok"}`
