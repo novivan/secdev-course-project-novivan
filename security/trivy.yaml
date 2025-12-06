@@ -1,0 +1,24 @@
+scan:
+  vulnerabilities: true
+
+  secrets: true
+
+  misconfig: true
+
+  license: false
+
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+  - LOW
+
+ignore-unfixed: false
+
+exit-code: 0
+
+format: json
+
+timeout: 5m
+
+cache-dir: /tmp/trivy-cache
