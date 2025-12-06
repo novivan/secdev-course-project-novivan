@@ -15,7 +15,7 @@ jobs:
   dast-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
           # Удаляем все контейнеры, связанные с этим проектом
           docker ps -a --filter "name=secdev-course-project" --format "{{.ID}}" | xargs -r docker rm -f || true
           echo "=== Cleanup completed ==="
-          
+
       - name: Commit and push ZAP reports
         run: |
           git config --local user.email "action@github.com"
