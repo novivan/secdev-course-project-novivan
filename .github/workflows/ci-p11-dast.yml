@@ -56,7 +56,7 @@ jobs:
             sleep 2
           done
           echo "Application failed to start within 60 seconds"
-          docker-compose logs app || true
+          docker compose logs app || true
           exit 1
 
       - name: Run OWASP ZAP baseline scan
