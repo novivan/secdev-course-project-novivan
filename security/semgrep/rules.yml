@@ -1,0 +1,47 @@
+
+rules:
+  - id: fastapi-hardcoded-secret
+    patterns:
+      - pattern: SECRET_KEY = "..."
+    message: "Hardcoded secret detected"
+    languages: [python]
+    severity: ERROR
+
+  - id: sql-injection-risk
+    patterns:
+      - pattern: f"SELECT ... $X ..."
+      - pattern: f"INSERT ... $X ..."
+      - pattern: f"UPDATE ... $X ..."
+      - pattern: f"DELETE ... $X ..."
+    message: "Potential SQL injection risk - use parameterized queries"
+    languages: [python]
+    severity: WARNING
+
+  - id: jwt-secret-hardcoded
+    patterns:
+      - pattern: |
+          SECRET_KEY = $KEY
+          ALGORITHM = "..."
+    message: "JWT secret should not be hardcoded, use environment variables"
+    languages: [python]
+    severity: ERROR
+
+  - id: password-in-log
+    patterns:
+      - pattern: print(...)
+      - pattern-inside: |
+          def $FUNC(..., password=..., ...):
+            ...
+            print(...)
+    message: "Password might be logged - avoid logging sensitive data"
+    languages: [python]
+    severity: WARNING
+
+  - id: debug-mode-production
+    patterns:
+      - pattern: debug=True
+      - pattern: reload=True
+    pattern-not: debug=False
+    message: "Debug/reload mode enabled - should be disabled in production"
+    languages: [python]
+    severity: ERROR

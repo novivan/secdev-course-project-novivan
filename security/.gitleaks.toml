@@ -1,0 +1,35 @@
+
+title = "Gitleaks configuration for SecDev Course"
+
+[general]
+extended = true
+
+# Исключения
+[allowlist]
+paths = [
+    "security/.gitleaks.toml",
+    ".gitleaks.toml",
+    ".semgrep.yml",
+    "security/semgrep/rules.yml",
+    "tests/.*",
+    ".*test_.*\\.py",
+    "docs/.*",
+    "README\\.md",
+    "SECURITY\\.md"
+]
+
+# Исключить определенные паттерны
+regexes = [
+    '''fallback_dev_key''',  # Тестовый ключ в auth.py
+    '''example\\.com''',      # Примеры доменов
+    '''test.*password''',    # Тестовые пароли
+    '''fake.*key'''         # Фейковые ключи
+]
+
+[output]
+format = "json"
+path = "EVIDENCE/P10/gitleaks.json"
+
+[scan]
+no-git = false
+skip-paths = [".gitignore"]
