@@ -39,13 +39,13 @@ jobs:
           echo "" >> EVIDENCE/P09/sca_summary.md
           echo "Generated on: $(date)" >> EVIDENCE/P09/sca_summary.md
           echo "" >> EVIDENCE/P09/sca_summary.md
-          
+
           # Проверяем, что файл существует и не пустой
           if [ -s EVIDENCE/P09/sca_report.json ]; then
             echo "## Vulnerability Count by Severity" >> EVIDENCE/P09/sca_summary.md
             echo "" >> EVIDENCE/P09/sca_summary.md
             echo '```json' >> EVIDENCE/P09/sca_summary.md
-            
+
             # Используем встроенный jq в GitHub Actions вместо Docker
             jq '[.matches[].vulnerability.severity] | group_by(.) | map({(.[0]): length}) | add // {}' \
               EVIDENCE/P09/sca_report.json >> EVIDENCE/P09/sca_summary.md
