@@ -1,0 +1,62 @@
+name: Security - SBOM & SCA
+
+on:
+  workflow_dispatch:  # Ручной запуск
+  push:
+    paths:
+      - 'requirements*.txt'
+      - '**/*.py'
+      - '.github/workflows/ci-sbom-sca.yml'
+  pull_request:
+    paths:
+      - 'requirements*.txt'
+      - '**/*.py'
+      - '.github/workflows/ci-sbom-sca.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sbom-sca:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM with Syft
+        run: |
+          docker run --rm -v $PWD:/work -w /work anchore/syft:latest \
+            packages dir:. -o cyclonedx-json > EVIDENCE/P09/sbom.json
+
+      - name: Run SCA with Grype
+        run: |
+          docker run --rm -v $PWD:/work -w /work anchore/grype:latest \
+            sbom:/work/EVIDENCE/P09/sbom.json -o json > EVIDENCE/P09/sca_report.json
+
+      - name: Generate SCA summary
+        run: |
+          echo "# SCA Vulnerability Summary" > EVIDENCE/P09/sca_summary.md
+          echo "" >> EVIDENCE/P09/sca_summary.md
+          echo "Generated on: $(date)" >> EVIDENCE/P09/sca_summary.md
+          echo "" >> EVIDENCE/P09/sca_summary.md
+
+          # Проверяем, что файл существует и не пустой
+          if [ -s EVIDENCE/P09/sca_report.json ]; then
+            echo "## Vulnerability Count by Severity" >> EVIDENCE/P09/sca_summary.md
+            echo "" >> EVIDENCE/P09/sca_summary.md
+            echo '```json' >> EVIDENCE/P09/sca_summary.md
+
+            # Используем встроенный jq в GitHub Actions вместо Docker
+            jq '[.matches[].vulnerability.severity] | group_by(.) | map({(.[0]): length}) | add // {}' \
+              EVIDENCE/P09/sca_report.json >> EVIDENCE/P09/sca_summary.md
+            echo '```' >> EVIDENCE/P09/sca_summary.md
+          else
+            echo "No vulnerabilities found or SCA report is empty." >> EVIDENCE/P09/sca_summary.md
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-sca-artifacts
+          path: EVIDENCE/P09/
+          retention-days: 30

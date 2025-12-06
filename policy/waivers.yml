@@ -1,0 +1,22 @@
+# Политика исключений для уязвимостей зависимостей
+# Этот файл содержит правила для временного игнорирования уязвимостей
+
+version: "1.0"
+created: 2025-12-06
+policy:
+  # Общие настройки политики
+  severity_threshold: "Medium"  # Минимальная серьезность для рассмотрения
+  review_period_days: 90        # Период пересмотра исключений
+
+  waivers:
+    - vulnerability: "GHSA-6c5p-j8vq-pqhj"
+      package: "python-jose"
+      version: "3.3.0"
+      severity: "Critical"
+      reason: "Уязвимость в JWT библиотеке, но в нашем приложении используется только для учебных целей с синтетическими данными"
+
+    - vulnerability: "GHSA-cjwg-qfpm-7377"
+      package: "python-jose"
+      version: "3.3.0"
+      severity: "Medium"
+      reason: "Уязвимость в JWT библиотеке, используется в учебном проекте без реальных данных"
