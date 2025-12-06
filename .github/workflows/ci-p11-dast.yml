@@ -1,0 +1,112 @@
+name: P11 - DAST (OWASP ZAP baseline)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [p11-dast-zap]
+    paths:
+      - 'app/**'
+      - '.github/workflows/ci-p11-dast.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  dast-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Start application using Docker Compose
+        run: |
+          # Останавливаем и удаляем предыдущие контейнеры
+          docker compose down || true
+          # Запускаем приложение через Docker Compose
+          docker compose up -d
+          echo "Docker Compose services started..."
+          sleep 10
+          # Проверяем, что приложение запустилось
+          docker compose ps
+          echo "=== Application logs ==="
+          docker compose logs app || true
+          echo "=== End application logs ==="
+
+      - name: Wait for application to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health > /dev/null; then
+              echo "Application is ready!"
+              exit 0
+            fi
+            echo "Waiting for application to start... ($i/30)"
+            sleep 2
+          done
+          echo "Application failed to start within 60 seconds"
+          docker compose logs app || true
+          exit 1
+
+      - name: Run OWASP ZAP baseline scan
+        run: |
+          docker run --rm \
+            --network secdev-network \
+            -v $(pwd):/zap/wrk/:rw \
+            -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+            -t http://app:8000/ \
+            -g gen.conf \
+            -r zap_baseline.html \
+            -J zap_baseline.json \
+            -d
+
+      - name: Create evidence directory
+        run: mkdir -p EVIDENCE/P11
+
+      - name: Copy ZAP reports to evidence directory
+        run: |
+          # ZAP создает отчеты с другими именами
+          ls -la *.html *.json || true
+          cp *.html EVIDENCE/P11/ 2>/dev/null || true
+          cp *.json EVIDENCE/P11/ 2>/dev/null || true
+          echo "=== Files in EVIDENCE/P11/ ==="
+          ls -la EVIDENCE/P11/ || true
+
+      - name: Upload ZAP reports as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: P11_EVIDENCE
+          path: |
+            EVIDENCE/P11/zap_baseline.html
+            EVIDENCE/P11/zap_baseline.json
+          retention-days: 30
+
+      - name: Stop and cleanup Docker containers
+        if: always()
+        run: |
+          echo "=== Stopping and cleaning up Docker containers ==="
+          docker compose down || true
+          # Удаляем все контейнеры, связанные с этим проектом
+          docker ps -a --filter "name=secdev-course-project" --format "{{.ID}}" | xargs -r docker rm -f || true
+          echo "=== Cleanup completed ==="
+
+      - name: Commit and push ZAP reports
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add EVIDENCE/P11/zap_baseline.*
+          git diff --staged --quiet || git commit -m "P11: add ZAP baseline reports"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
