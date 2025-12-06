@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: secdev-app-network-policy
+  namespace: secdev-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: secdev-app
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: secdev-namespace
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: secdev-namespace
+    ports:
+    - protocol: TCP
+      port: 8000
